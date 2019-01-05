@@ -5,16 +5,15 @@
 </template>
 
 <script>
-/*import axios from 'axios'; */
+import axios from 'axios';
 
 export default {
   name: 'Ping',
   data() {
     return {
-      msg: 'Hello!'
+      msg: 'Hello!',
     };
-  }
-  /*
+  },
   methods: {
     getMessage() {
       const path = 'http://127.0.0.1:5000/ping';
@@ -26,11 +25,10 @@ export default {
         .catch(error => {
           console.error(error);
         });
-    }
+    },
   },
   created() {
     this.getMessage();
-  }
-  */
+  },
 };
 </script>

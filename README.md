@@ -1,8 +1,10 @@
 # silver-funicular
 
-Try out framework, tools, and others
+Trying out framework, tools, and others
 
-# Project: flask-vue-crud
+## Project: flask-vue-crud
+
+This is an exercise inspired by the blog post at [testdriven.io](https://testdriven.io/blog/developing-a-single-page-app-with-flask-and-vuejs/#vue-setup)
 
 ### Server
 
