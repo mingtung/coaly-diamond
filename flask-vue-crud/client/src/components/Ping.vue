@@ -1,6 +1,6 @@
 <template>
-  <div>
-    <p>{{ msg }}</p>
+  <div class="container">
+    <button type="button" class="btn btn-primary">{{ msg }}</button>
   </div>
 </template>
 
@@ -19,11 +19,11 @@ export default {
       const path = 'http://127.0.0.1:5000/ping';
       axios
         .get(path)
-        .then(res => {
+        .then((res) => {
           this.msg = res.data;
         })
-        .catch(error => {
-          console.error(error);
+        .catch((error) => {
+          console.log(error);
         });
     },
   },
