@@ -25,7 +25,7 @@
                 <span v-else>No</span>
               </td>
               <td>
-                <button type="button" class="btn btn-warning btn-sm">Update</button>
+                <button type="button" class="btn btn-warning btn-sm" v-b-modal.book-modal @click="editBook(book)">Update</button>
                 <button type="button" class="btn btn-danger btn-sm">Delete</button>
               </td>
             </tr>
@@ -79,6 +79,7 @@ export default {
     return {
       books: [],
       addBookForm: {
+        id: '',
         title: '',
         author: '',
         read: [],
@@ -116,7 +117,26 @@ export default {
           this.showMessage = true;
         });
     },
+    editBook(book) {
+      this.addBookForm = book;
+    },
+    updateBook(payload, bookId) {
+      const path = `http://localhost:5000/books/${bookId}`;
+      axios.put(path, payload)
+        .then(() => {
+          this.getBooks();
+          this.message = 'Book updated!';
+          this.showMessage = true;
+        })
+        .catch((error) => {
+          console.log(error);
+          this.getBooks();
+          this.message = 'Something went wrong when updating the book:(';
+          this.showMessage = true;
+        });
+    },
     initForm() {
+      this.addBookForm.id = '';
       this.addBookForm.title = '';
       this.addBookForm.author = '';
       this.addBookForm.read = [];
@@ -133,7 +153,11 @@ export default {
         author: this.addBookForm.author,
         read,
       };
-      this.addBook(payload);
+      if (this.addBookForm.id !== '') {
+        this.updateBook(payload, this.addBookForm.id);
+      } else {
+        this.addBook(payload);
+      }
       this.initForm();
     },
     onReset(evt) {
