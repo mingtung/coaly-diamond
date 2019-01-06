@@ -63,11 +63,13 @@ def all_books():
 
 
 def remove_book(book_id):
-    for book in BOOKS:
-        if book['id'] == book_id:
-            BOOKS.remove(book)
-            return True
-    return False
+    the_book = [book for book in BOOKS if book['id'] == book_id]
+    if the_book:
+        BOOKS.remove(the_book[0])
+        return True
+    else:
+        return False
+
 
 @app.route('/books/<book_id>', methods=['PUT'])
 def single_book(book_id):
