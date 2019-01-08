@@ -14,27 +14,23 @@ CORS(app)
 It's worth noting that the above setup allows cross-origin requests on all routes, from any domain, protocol, or port. In a production environment, you should only allow cross-origin requests from the domain where the front-end application is hosted. Refer to the Flask-CORS documentation for more info on this.
 """
 
+BOOKS = [{
+    'id': uuid.uuid4().hex,
+    'title': 'On the Road',
+    'author': 'Jack Kerouac',
+    'read': True
+}, {
+    'id': uuid.uuid4().hex,
+    'title': 'Harry Potter and the Philosopher\'s Stone',
+    'author': 'J. K. Rowling',
+    'read': False
+}, {
+    'id': uuid.uuid4().hex,
+    'title': 'Green Eggs and Ham',
+    'author': 'Dr. Seuss',
+    'read': False
+}]
 
-BOOKS = [
-    {
-        'id': uuid.uuid4().hex,
-        'title': 'On the Road',
-        'author': 'Jack Kerouac',
-        'read': True
-    },
-    {
-        'id': uuid.uuid4().hex,
-        'title': 'Harry Potter and the Philosopher\'s Stone',
-        'author': 'J. K. Rowling',
-        'read': False
-    },
-    {
-        'id': uuid.uuid4().hex,
-        'title': 'Green Eggs and Ham',
-        'author': 'Dr. Seuss',
-        'read': False
-    }
-]
 
 @app.route('/books', methods=['GET', 'POST'])
 def all_books():
@@ -71,7 +67,7 @@ def remove_book(book_id):
         return False
 
 
-@app.route('/books/<book_id>', methods=['PUT'])
+@app.route('/books/<book_id>', methods=['PUT', 'DELETE'])
 def single_book(book_id):
     response_object = {'status': 'success'}
     if request.method == 'PUT' and request.get_json():
@@ -88,6 +84,9 @@ def single_book(book_id):
         else:
             response_object['message'] = 'No such book.'
             response_object['status'] = 'failed'
+    elif request.method == 'DELETE':
+        is_removed = remove_book(book_id)
+        response_object['message'] = 'Book removed!'
     else:
         response_object['status'] = 'failed'
 

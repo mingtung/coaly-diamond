@@ -5,7 +5,10 @@
         <h1>Books</h1>
         <hr><br><br>
         <alert :message="message" v-if="showMessage"></alert>
-        <button type="button" class="btn btn-success btn-sm" v-b-modal.book-modal>Add Book</button>
+        <button type="button"
+                class="btn btn-success btn-sm"
+                v-b-modal.book-modal>Add Book
+        </button>
         <br><br>
         <table class="table table-hover">
           <thead>
@@ -25,8 +28,14 @@
                 <span v-else>No</span>
               </td>
               <td>
-                <button type="button" class="btn btn-warning btn-sm" v-b-modal.book-modal @click="editBook(book)">Update</button>
-                <button type="button" class="btn btn-danger btn-sm">Delete</button>
+                <button type="button"
+                        class="btn btn-warning btn-sm"
+                        v-b-modal.book-modal
+                        @click="onEditBook(book)">Update
+                </button>
+                <button type="button"
+                        class="btn btn-danger btn-sm"
+                        @click="onDeleteBook(book)">Delete</button>
               </td>
             </tr>
           </tbody>
@@ -35,8 +44,8 @@
     </div>
     <b-modal ref="addBookModal"
              id="book-modal"
-             title="Add a new book"
              hide-footer>
+      <div slot="modal-title">{{ bookModalTitle }}</div>
       <b-form @submit="onSubmit" @reset="onReset" class="w-100">
       <b-form-group id="form-title-group"
                     label="Title:"
@@ -84,6 +93,7 @@ export default {
         author: '',
         read: [],
       },
+      bookModalTitle: 'Add a new book',
       message: '',
       showMessage: false,
     };
@@ -94,52 +104,77 @@ export default {
   methods: {
     getBooks() {
       const path = 'http://localhost:5000/books';
-      axios.get(path)
-        .then((res) => {
+      axios
+        .get(path)
+        .then(res => {
           this.books = res.data.books;
         })
-        .catch((error) => {
+        .catch(error => {
           console.log(error);
         });
     },
     addBook(payload) {
       const path = 'http://localhost:5000/books';
-      axios.post(path, payload)
+      axios
+        .post(path, payload)
         .then(() => {
           this.getBooks();
           this.message = 'Book added!';
           this.showMessage = true;
         })
-        .catch((error) => {
+        .catch(error => {
           console.log(error);
           this.getBooks();
           this.message = 'Something went wrong when adding the book:(';
           this.showMessage = true;
         });
     },
-    editBook(book) {
-      this.addBookForm = book;
-    },
     updateBook(payload, bookId) {
       const path = `http://localhost:5000/books/${bookId}`;
-      axios.put(path, payload)
+      axios
+        .put(path, payload)
         .then(() => {
           this.getBooks();
           this.message = 'Book updated!';
           this.showMessage = true;
         })
-        .catch((error) => {
+        .catch(error => {
           console.log(error);
           this.getBooks();
           this.message = 'Something went wrong when updating the book:(';
           this.showMessage = true;
         });
     },
+    deleteBook(bookId) {
+      const path = `http://localhost:5000/books/${bookId}`;
+      axios
+        .delete(path)
+        .then(() => {
+          this.getBooks();
+          this.message = 'Book deleted!';
+          this.showMessage = true;
+        })
+        .catch(error => {
+          console.log(error);
+          this.getBooks();
+          this.message = 'Something went wrong when deleting the book:(';
+          this.showMessage = true;
+        });
+    },
+    onEditBook(book) {
+      this.addBookForm = book;
+      this.bookModalTitle = 'Edit the book';
+    },
+    onDeleteBook(book) {
+      this.deleteBook(book.id);
+      this.initForm();
+    },
     initForm() {
       this.addBookForm.id = '';
       this.addBookForm.title = '';
       this.addBookForm.author = '';
       this.addBookForm.read = [];
+      this.bookModalTitle = 'Add a new book';
     },
     onSubmit(evt) {
       evt.preventDefault();

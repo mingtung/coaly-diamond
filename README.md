@@ -2,9 +2,9 @@
 
 Trying out framework, tools, and others
 
-## [WIP] Project: flask-vue-crud
+## Project: flask-vue-crud
 
-This is an exercise inspired by the blog post at [testdriven.io](https://testdriven.io/blog/developing-a-single-page-app-with-flask-and-vuejs/#vue-setup)
+This is an exercise about single page app using Flask and Vue.js inspired by the blog post at [testdriven.io](https://testdriven.io/blog/developing-a-single-page-app-with-flask-and-vuejs/#vue-setup).
 
 ### Server
 
@@ -28,3 +28,5 @@ This is an exercise inspired by the blog post at [testdriven.io](https://testdri
 
 - Run client: `npm run dev`
   * runs on http://localhost:8080
+
+### [WIP] Tests
