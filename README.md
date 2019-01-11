@@ -13,9 +13,8 @@ This is an exercise about single page app using Flask and Vue.js inspired by the
 * `source env/bin/activate`
 * `pip install -r requirments.txt`
 
-- Run server: `python server/app.py`
-  * runs on http://localhost:5000
-  * try hit http://localhost:5000/ping
+* `python server/app.py` to run the server
+  * runs on http://localhost:5000/ping
 
 ### Client
 
@@ -26,7 +25,7 @@ This is an exercise about single page app using Flask and Vue.js inspired by the
 * Using Bootstrap CSS framework. Installing it: `npm install bootstrap@4.1.1 --save`
 * Using Bootstrap Vue library. Installing it: `npm install bootstrap-vue@2.0.0-rc.11 --save`
 
-- Run client: `npm run dev`
+- `npm run dev` to run the client
   * runs on http://localhost:8080
 
 ### [WIP] Tests
