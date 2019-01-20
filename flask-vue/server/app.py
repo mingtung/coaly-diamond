@@ -33,7 +33,7 @@ app.register_blueprint(auth.bp)
 
 # register blueprint for blog
 app.register_blueprint(blog.bp)
-app.add_url_rule('/', endpoint='index')
+app.add_url_rule('/blog', endpoint='blog')
 
 # enable CORS
 CORS(app)
