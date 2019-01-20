@@ -1,10 +1,10 @@
-# silver-funicular
+# coaly-diamond
 
 Trying out framework, tools, and others
 
-## Project: flask-vue-crud
+## Project: flask-vue
 
-This is an exercise about single page app using Flask and Vue.js inspired by the blog post at [testdriven.io](https://testdriven.io/blog/developing-a-single-page-app-with-flask-and-vuejs/#vue-setup).
+This is an exercise app using Flask and Vue.js inspired by the blog post at [testdriven.io](https://testdriven.io/blog/developing-a-single-page-app-with-flask-and-vuejs/#vue-setup), and the Flask tutorial from [the offical site](http://flask.pocoo.org/docs/1.0/tutorial/)
 
 ### Server
 
@@ -12,7 +12,6 @@ This is an exercise about single page app using Flask and Vue.js inspired by the
 * `python3 -m venv env`
 * `source env/bin/activate`
 * `pip install -r requirments.txt`
-
 * `python server/app.py` to run the server
   * runs on http://localhost:5000/ping
 
@@ -28,4 +27,4 @@ This is an exercise about single page app using Flask and Vue.js inspired by the
 - `npm run dev` to run the client
   * runs on http://localhost:8080
 
-### [WIP] Tests
+### [TODO] Tests
