@@ -1,9 +1,4 @@
-# Coding exercise
-
-* a flask api app providing a GET endpoint
-  * api
-  * doc
-  * unittest
+# Coding exercise: flask-restplus app, documentation, and unittest
 
 ## Set up
 
@@ -35,7 +30,7 @@ SELECT DISTINCT ?astronaut ?astronautLabel ?image ?birthdate ?birthplace ?birthp
   wdt:P18 ?image;
   wdt:P569 ?birthdate;
   wdt:P19 ?birthplace.
-  
+
   #?birthplace wdt:P625 ?coord;
   ?birthplace wdt:P17 ?country;
   SERVICE wikibase:label { bd:serviceParam wikibase:language "en". }
