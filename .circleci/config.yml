@@ -3,10 +3,32 @@ jobs:
   build:
     docker:
       - image: circleci/python:3.7.3
+    working_directory: ~/repo
     steps:
       - checkout
-      - run: echo "A first hello"
-      - run: sleep 10
+      - run: echo "A hello world"
+      - setup_remote_docker:
+          docker_layer_caching: true
+          version: 18.06.0-ce
+
+      - run:
+          name: Install Docker client
+          command: |
+            set -x
+            VER="17.03.0-ce"
+            curl -L -o /tmp/docker-$VER.tgz https://download.docker.com/linux/static/stable/x86_64/docker-$VER.tgz
+            tar -xz -C /tmp -f /tmp/docker-$VER.tgz
+            sudo mv /tmp/docker/* /usr/bin
+
+      - run:
+          name: run tests
+          command: |
+            docker image build -t docker-exercise docker-exercise/web
+            docker container run -d docker-exercise python -m unittest discover web
+
+      - store_artifacts:
+          path: test-reports
+          destination: test-reports
 
 workflows:
   version: 2
