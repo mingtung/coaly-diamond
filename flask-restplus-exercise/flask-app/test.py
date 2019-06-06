@@ -6,6 +6,7 @@ from app import flask_app
 
 
 class BooksTests(unittest.TestCase):
+
     def setUp(self):
         self.app = flask_app.test_client()
 

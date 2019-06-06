@@ -1,39 +1,44 @@
 # Coding exercise: flask-restplus app, documentation, and unittest
 
-## Set up
+Two options to set up and run the app, 1. with venv or 2. with docker
 
-* `python3 -m venv env`
-* `source env/bin/activate`
-* `pip install -r requirements.txt`
+### 1. Set up and run with venv
 
-## Run app
+* set up
+  ```
+  $ python3 -m venv env
+  $ pip install -r requirements.txt
+  $ cd flask-app
+  ```
+* run app: `python app.py`
+* api doc/demo: `http://localhost:5000/`
+* run tests: `python test.py`
 
-* `python app.py`
+### 2. Set up and run docker container
 
-## Api doc/demo
+```
+# cd to where the `docker-compose.yml` file is
+$ docker-compose up --build
+```
 
-* `http://localhost:5000/`
+* check the url `http://0.0.0.0` or `http://localhost`
 
-## Run tests
+## Data
 
-* `python test_app.py`
-
-
-### Data
 Demo data is from wikidata. It is currently dumped and stored as json. It's worth to checkout sparql query in the future.
 
 ```
 # select all astronauts with name, image, birthdate, birthplace and coordinates of the birthplace
 
 SELECT DISTINCT ?astronaut ?astronautLabel ?image ?birthdate ?birthplace ?birthplaceLabel ?countryLabel(year(xsd:dateTime(?birthdate)) as ?birthyear) WHERE {
-  ?astronaut ?x1 wd:Q11631;
-  wdt:P18 ?image;
-  wdt:P569 ?birthdate;
-  wdt:P19 ?birthplace.
+?astronaut ?x1 wd:Q11631;
+wdt:P18 ?image;
+wdt:P569 ?birthdate;
+wdt:P19 ?birthplace.
 
-  #?birthplace wdt:P625 ?coord;
-  ?birthplace wdt:P17 ?country;
-  SERVICE wikibase:label { bd:serviceParam wikibase:language "en". }
+#?birthplace wdt:P625 ?coord;
+?birthplace wdt:P17 ?country;
+SERVICE wikibase:label { bd:serviceParam wikibase:language "en". }
 }
 ORDER BY DESC(?birthplace)
 ```

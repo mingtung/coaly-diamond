@@ -5,21 +5,21 @@ from collections import defaultdict
 from flask import Flask, jsonify, request
 from flask_restplus import Api, Resource, abort
 
-
 flask_app = Flask(__name__)
-app = Api(app=flask_app,
-          version='1.0',
-          title='Demo astronaut names grouped by their birthplace',
-          description='Show astronauts queried by their birthplace (country)'
-                      ' then grouped by birthplace (city)')
-astronauts_namespace = app.namespace('astronauts',
-                                     description='APIs for astronauts info')
+app = Api(
+    app=flask_app,
+    version='1.0',
+    title='Demo astronaut names grouped by their birthplace',
+    description='Show astronauts queried by their birthplace (country)'
+    ' then grouped by birthplace (city)')
+astronauts_namespace = app.namespace('astronauts', description='APIs for astronauts info')
 place_parser = app.parser()
 place_parser.add_argument(
     'country',
-    type=str, required=True,
+    type=str,
+    required=True,
     help="the country that is astronauts birthplace in string for which spaces "
-         "are replaced by '-', e.g. United-States-of-America, Russia, etc")
+    "are replaced by '-', e.g. United-States-of-America, Russia, etc")
 
 
 def group_astronauts_by_city(data):
@@ -47,9 +47,9 @@ def get_astronauts_by_country(country):
 
 
 @astronauts_namespace.route('')
-@app.doc(responses={200: 'OK', 400: 'Invalid Argument',
-                    502: 'Bad Gateway'})
+@app.doc(responses={200: 'OK', 400: 'Invalid Argument', 502: 'Bad Gateway'})
 class Astronauts(Resource):
+
     @app.expect(place_parser)
     def get(self):
         try:
@@ -68,4 +68,4 @@ class Astronauts(Resource):
 
 
 if __name__ == '__main__':
-    flask_app.run(debug=True)
+    flask_app.run(host="0.0.0.0", port=5000)
