@@ -10,7 +10,6 @@ jobs:
       - setup_remote_docker:
           docker_layer_caching: true
           version: 18.06.0-ce
-
       - run:
           name: Install Docker client
           command: |
@@ -19,13 +18,16 @@ jobs:
             curl -L -o /tmp/docker-$VER.tgz https://download.docker.com/linux/static/stable/x86_64/docker-$VER.tgz
             tar -xz -C /tmp -f /tmp/docker-$VER.tgz
             sudo mv /tmp/docker/* /usr/bin
-
       - run:
-          name: run tests
+          name: run tests for docker-exercise
           command: |
             docker image build -t docker-exercise docker-exercise/web
             docker container run -d docker-exercise python -m unittest discover web
-
+      - run:
+          name: run tests for flask-restplus-exercise
+          command: |
+            docker image build -t flask-restplus-exercise flask-restplus-exercise/flask-app
+            docker container run -d flask-restplus-exercise python -m unittest discover flask-app
       - store_artifacts:
           path: test-reports
           destination: test-reports
