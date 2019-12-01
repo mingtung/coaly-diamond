@@ -15,10 +15,14 @@
 * set up grafana with influxdb
     * some common steps
     * use "http://127.0.0.1:8086/" (instead of localhost:8086) when setting up influxdb as a datasource in grafana.  
+
+* api key from [Alphavantage API](https://www.alphavantage.co/documentation/)
  
 ### WIP
-- Example data from [Alphavantage API](https://www.alphavantage.co/documentation/)
-- run `$ python demo_stock.py`. This will parse data from Alphavatage and put it in Influxdb.
+- add data for a symbol via CLI tool
+   - `$ python demo_stock.py GOOGL`
+   - This gets data from alphavantage, parses the data and stores it in Influxdb.
+   
 - open grafana and create a dashboard, e.g. 
     - FROM default "GOOGL"
     - SELECT field(open)
