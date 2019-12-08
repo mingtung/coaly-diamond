@@ -19,13 +19,17 @@
 * api key from [Alphavantage API](https://www.alphavantage.co/documentation/)
  
 ### WIP
-- add data for a symbol via CLI tool
-   - `$ python demo_stock.py GOOGL`
+- add trading data by symbol via CLI tool
+   - `$ python symbol.py GOOGL`
    - This gets data from alphavantage, parses the data and stores it in Influxdb.
    
-- open grafana and create a dashboard, e.g. 
+- add trading data by symbol via app
+   - `$ python app.py`
+   - `http://localhost:5000/symbols`
+
+~~- open grafana and create a dashboard, e.g. 
     - FROM default "GOOGL"
     - SELECT field(open)
     - FORMAT AS Time series
-    - ALIAS BY open
+    - ALIAS BY open~~
  

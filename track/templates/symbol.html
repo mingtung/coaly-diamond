@@ -1,0 +1,35 @@
+<html>
+    <head>
+    </head>
+    <body>
+        <h1>Symbols</h1>
+        <h2>Add a new symbol by name</h2>
+            <form action="/symbols" method="POST">
+                <div>
+                    <label>Search symbol:</label>
+                    <input type="text" id="search_symbol" name="search_symbol" placeholder="GOOGL">
+                    <button type="submit">Search</button>
+                    {% if search_result %}
+                        <ul>
+                            {% for i in search_result %}
+                                <li><b>{{ i['1. symbol'] }}</b> {{ i }} </li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+                </div>
+                <div>
+                    <label>Add symbol:</label>
+                    <input type="text" id="confirmed_symbol" name="confirmed_symbol" placeholder="GOOGL">
+                    <button type="submit">Add</button>
+                </div>
+            </form>
+        <h2>Already added symbols</h2>
+        <ol>
+            {% for i in symbols %}
+                <li>{{ i }}</li>
+            {% endfor %}
+        </ol>
+    </body>
+</html>
+
+
