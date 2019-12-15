@@ -11,21 +11,29 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 
-class SymbolManager:
+class SymbolUtil:
     ALPHAVANTAGE_API_KEY = os.environ.get("ALPHAVANTAGE_API_KEY")
-    user = "root"
-    password = "root"
-    dbname = "stock"
-    client = InfluxDBClient(
-        host="127.0.0.1", port=8086, username=user, password=password, database=dbname
-    )
-    client.create_database(
-        dbname
-    )  # Currently influxdb checks if the db exists. If it does, influxdb does nothing
-    # and return
+
+    def __init__(self, host='127.0.0.1', port=8086, dbname="stock", user="root", password="root", timeout=60):
+        self.host = host
+        self.port = port
+        self.user = user
+        self.password = password
+        self.dbname = dbname
+        self.timeout = timeout
+        self.client = None
+
+    def __enter__(self):
+        self.client = InfluxDBClient(
+            host=self.host, port=self.port, username=self.user, password=self.password, database=self.dbname, timeout=self.timeout
+        )
+        return self
+
+    def __exit__(self, exc_type, exc_value, exc_traceback):
+        self.client.close()
 
     @classmethod
-    def _parse_trades(cls, data, symbol):
+    def parse_trades(cls, data, symbol):
         trade_data = []
         for k, v in data.items():
             try:
@@ -46,14 +54,6 @@ class SymbolManager:
         return trade_data
 
     @classmethod
-    def get_all_symbols(cls):
-        query = 'SELECT count("open") from "trade" group by "symbol"'  # the selected count on `open` does not matter
-        result = cls.client.query(query)
-        symbols = [i[1]['symbol'] for i in result.keys()]
-
-        return symbols
-
-    @classmethod
     def get_trade_data(cls, symbol):
         ts = TimeSeries(key=cls.ALPHAVANTAGE_API_KEY)
         symbol = symbol if symbol else "GOOGL"
@@ -71,22 +71,10 @@ class SymbolManager:
             logging.error(f'Error when trying to get "2. Symbol" from meta_data')
             return
 
-        trade_data = cls._parse_trades(data, symbol)
+        trade_data = cls.parse_trades(data, symbol)
         logger.info(f'got {len(trade_data)} records')
 
         return trade_data
-
-    @classmethod
-    def write_trade_data_in_db(cls, symbol):
-        json_body = cls.get_trade_data(symbol)
-        if json_body:
-            cls.client.write_points(json_body)
-        else:
-            logger.info(f'no data to write into db')
-
-    @classmethod
-    def close_client(cls):
-        cls.client.close()
 
     @classmethod
     def search_in_alphavantage(cls, keyword):
@@ -100,12 +88,29 @@ class SymbolManager:
             logging.error(f"Alphavantage api error: {e}")
 
 
+def get_all_symbols():
+    with SymbolUtil() as symbol_manager:
+        query = 'SELECT count("open") from "trade" group by "symbol"'  # the selected count on `open` does not matter
+        result = symbol_manager.client.query(query)
+        symbols = [i[1]['symbol'] for i in result.keys()]
+
+    return symbols
+
+
+def write_trade_data_in_db(symbol):
+    json_body = SymbolUtil.get_trade_data(symbol)
+    if json_body:
+        with SymbolUtil() as symbol_manager:
+            symbol_manager.client.write_points(json_body)
+    else:
+        logger.info(f'no data to write into db')
+
+
 if __name__ == "__main__":
     ALPHAVANTAGE_API_KEY = os.environ.get("ALPHAVANTAGE_API_KEY")
     if ALPHAVANTAGE_API_KEY:
         symbol = sys.argv[1] if len(sys.argv) == 2 else None
-        SymbolManager.write_trade_data_in_db(symbol)
-        SymbolManager.close_client()
+        write_trade_data_in_db(symbol)
 
     else:
         print(f"Set ALPHAVANTAGE_API_KEY as an environment variable first")
