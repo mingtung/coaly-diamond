@@ -2,7 +2,7 @@ import json
 import logging
 import os
 
-from flask import Flask, request, Response, render_template
+from flask import Flask, request, Response, render_template, jsonify
 
 from symbol import SymbolUtil, write_trade_data_in_db, get_all_symbols
 
@@ -35,6 +35,15 @@ def list_symbols():
 def search_symbol(keyword):
     return SymbolUtil.search_in_alphavantage(keyword)
 
+
+@app.route('/get-trade-data/<symbol>', methods=['GET'])
+def get_trade_data(symbol):
+    return jsonify(SymbolUtil.get_trade_data(symbol))
+
+
+@app.route('/', methods=['GET'])
+def home():
+    return Response('http://localhost:5000/symbols')
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000, debug=True)

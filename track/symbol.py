@@ -1,8 +1,11 @@
+from datetime import datetime
 import os
 import json
 import sys
 import logging
+import time
 
+import influxdb
 import requests
 from influxdb import InfluxDBClient
 from alpha_vantage.timeseries import TimeSeries
@@ -27,6 +30,7 @@ class SymbolUtil:
         self.client = InfluxDBClient(
             host=self.host, port=self.port, username=self.user, password=self.password, database=self.dbname, timeout=self.timeout
         )
+        self.client.create_database(self.dbname)  # Currently influxdb checks if the db exists. If it does, influxdb does nothing and return
         return self
 
     def __exit__(self, exc_type, exc_value, exc_traceback):
@@ -54,13 +58,16 @@ class SymbolUtil:
         return trade_data
 
     @classmethod
-    def get_trade_data(cls, symbol):
+    def get_trade_data(cls, symbol, outputsize='compact'):
+        if not symbol:
+            logging.info(f'please provider a symbol')
+            return
+
         ts = TimeSeries(key=cls.ALPHAVANTAGE_API_KEY)
-        symbol = symbol if symbol else "GOOGL"
         # Get json object with the daily data and another with the call's metadata
         logger.info(f"Getting data for {symbol}")
         try:
-            data, meta_data = ts.get_daily(symbol)
+            data, meta_data = ts.get_daily(symbol, outputsize=outputsize)
         except ValueError:
             # no data found for symbol
             return
@@ -97,21 +104,58 @@ def get_all_symbols():
     return symbols
 
 
-def write_trade_data_in_db(symbol):
-    json_body = SymbolUtil.get_trade_data(symbol)
-    if json_body:
-        with SymbolUtil() as symbol_manager:
-            symbol_manager.client.write_points(json_body)
-    else:
+def write_trade_data_in_db(symbol, full=False):
+    if not symbol:
+        logging.info(f'please provider a symbol')
+        return
+
+    json_body = SymbolUtil.get_trade_data(symbol, outputsize='full' if full else 'compact')
+    if not json_body:
         logger.info(f'no data to write into db')
+        return
+
+    logger.info(f'write trade data for symbol {symbol}')
+    with SymbolUtil() as symbol_manager:
+        try:
+            while len(json_body) > 0:
+                data = json_body[-500:]
+                print(f'write up to 500 data points')
+                symbol_manager.client.write_points(data)
+
+                json_body = json_body[:-500]
+                time.sleep(2)
+
+        except influxdb.exceptions.InfluxDBServerError as err:
+            logger.error(f'error {err}')
 
 
 if __name__ == "__main__":
     ALPHAVANTAGE_API_KEY = os.environ.get("ALPHAVANTAGE_API_KEY")
     if ALPHAVANTAGE_API_KEY:
-        symbol = sys.argv[1] if len(sys.argv) == 2 else None
-        write_trade_data_in_db(symbol)
+        if len(sys.argv) < 2:
+            print('please provide a symbol, e.g. GOOGL')
+        elif len(sys.argv) == 2:
+            symbol = sys.argv[1]
+            write_trade_data_in_db(symbol)
+        else:
+            for i in sys.argv[1:]:
+                try:
+                    key, v = i.split('=')
+                    if v != '1':
+                        print(f'command "{key}" has no effect')
+                        continue
+                    if key == 'full':
+                        symbol = sys.argv[1]
+                        print(f'loading full data for {symbol}')
+                        write_trade_data_in_db(symbol, full=True)
+                    elif key == 'update_all':
+                        print(f'update all trade data for symbols')
+                        for symbol in get_all_symbols():
+                            write_trade_data_in_db(symbol)
+                except ValueError:
+                    pass
 
+            print(f'done')
     else:
         print(f"Set ALPHAVANTAGE_API_KEY as an environment variable first")
         print(f"abort")
