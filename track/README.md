@@ -42,3 +42,6 @@
     - FORMAT AS Time series
     - ALIAS BY open~~
  
+- trouble shooting notes:
+  - never ending "Aborted compaction" error from influxdb
+    - run `find /usr/local/var/influxdb -name "*.tmp" -type f -delete`

@@ -133,11 +133,9 @@ if __name__ == "__main__":
     ALPHAVANTAGE_API_KEY = os.environ.get("ALPHAVANTAGE_API_KEY")
     if ALPHAVANTAGE_API_KEY:
         if len(sys.argv) < 2:
-            print('please provide a symbol, e.g. GOOGL')
-        elif len(sys.argv) == 2:
-            symbol = sys.argv[1]
-            write_trade_data_in_db(symbol)
+            print('please provide a symbol, e.g. GOOGL, or use a command, e.g. update_all=1')
         else:
+            no_command = False
             for i in sys.argv[1:]:
                 try:
                     key, v = i.split('=')
@@ -153,7 +151,10 @@ if __name__ == "__main__":
                         for symbol in get_all_symbols():
                             write_trade_data_in_db(symbol)
                 except ValueError:
-                    pass
+                    no_command = True
+            if no_command:
+                symbol = sys.argv[1]
+                write_trade_data_in_db(symbol)
 
             print(f'done')
     else:
