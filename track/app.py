@@ -38,7 +38,7 @@ def search_symbol(keyword):
 
 @app.route('/get-trade-data/<symbol>', methods=['GET'])
 def get_trade_data(symbol):
-    return jsonify(SymbolUtil.get_trade_data(symbol))
+    return jsonify(SymbolUtil.get_daily_trade_data(symbol))
 
 
 @app.route('/', methods=['GET'])
