@@ -26,7 +26,7 @@ class SymbolUtil:
         token=INFLUXDB_ADMIN_TOKEN,
         org=INFLUXDB_ORG,
         bucket=INFLUXDB_BUCKET,
-        debug=True,
+        debug=False,
     ):
         self.host = host
         self.port = port
@@ -132,8 +132,8 @@ class SymbolUtil:
         self.write_api.write(bucket=self.bucket, org=self.org, record=points)
 
 
-def get_all_symbols():
-    with SymbolUtil() as symbol_manager:
+def get_all_symbols(debug=False):
+    with SymbolUtil(debug=debug) as symbol_manager:
         query = (
             f'from(bucket:"{symbol_manager.bucket}")'
             " |> range(start: -20d)"
@@ -149,7 +149,7 @@ def get_all_symbols():
     return symbols
 
 
-def write_trade_data_in_db(symbol, full=False):
+def write_trade_data_in_db(symbol, full=False, debug=False):
     if not symbol:
         logging.info(f"please provider a symbol")
         return
@@ -162,7 +162,7 @@ def write_trade_data_in_db(symbol, full=False):
         return
 
     logger.info(f"write trade data for symbol {symbol}")
-    with SymbolUtil() as symbol_manager:
+    with SymbolUtil(debug=debug) as symbol_manager:
         try:
             while len(json_body) > 0:
                 points = json_body[-500:]
@@ -180,7 +180,8 @@ if __name__ == "__main__":
     ALPHAVANTAGE_API_KEY = os.environ.get("ALPHAVANTAGE_API_KEY")
     INFLUXDB_ADMIN_TOKEN = os.environ.get("INFLUXDB_ADMIN_TOKEN")
     INFLUXDB_ORG = os.environ.get("INFLUXDB_ORG")
-    INFLUXDB_BUCKET = os.environ.get("INFLUX_BUCKET")
+    INFLUXDB_BUCKET = os.environ.get("INFLUXDB_BUCKET")
+    DEBUG = os.environ.get("DEBUG", False)
 
     if (
         ALPHAVANTAGE_API_KEY
@@ -193,30 +194,38 @@ if __name__ == "__main__":
                 "please provide a symbol, e.g. GOOGL, or use a command, e.g. update_all=1"
             )
         else:
-            no_command = False
+            full, update_all = False, False
             for i in sys.argv[1:]:
                 try:
                     key, v = i.split("=")
                     if v != "1":
                         print(f'command "{key}" has no effect')
                         continue
+                    if key == "debug":
+                        DEBUG = True
+                        print(f"debug mode on")
                     if key == "full":
-                        symbol = sys.argv[1]
-                        print(f"loading full data for {symbol}")
-                        write_trade_data_in_db(symbol, full=True)
-                    elif key == "update_all":
-                        print(f"update all trade data for symbols")
-                        for symbol in get_all_symbols():
-                            print(f"writing trade data in db for {symbol}")
-                            write_trade_data_in_db(symbol)
+                        full = True
+                        print(f"loading full trade data")
+                    if key == "update_all":
+                        update_all = True
+                        print(f"update trade data for all symbols")
                 except ValueError:
-                    no_command = True
-            if no_command:
-                symbol = sys.argv[1]
+                    symbol = i
+                    print(f"got symbol {symbol}")
+
+            if update_all:
+                for symbol in get_all_symbols(debug=DEBUG):
+                    print(f"writing trade data in db for {symbol}")
+                    write_trade_data_in_db(symbol, full=full, debug=DEBUG)
+                    time.sleep(1)
+            else:
                 print(f"writing trade data in db for {symbol}")
-                write_trade_data_in_db(symbol)
+                write_trade_data_in_db(symbol, full=full, debug=DEBUG)
 
             print(f"done")
     else:
-        print(f"Set ALPHAVANTAGE_API_KEY as an environment variable first")
+        print(
+            f"Set ALPHAVANTAGE_API_KEY, INFLUXDB_ADMIN_TOKEN, INFLUXDB_ORG, INFLUXDB_BUCKET as an environment variable first"
+        )
         print(f"abort")
