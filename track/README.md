@@ -1,3 +1,5 @@
+# WIP
+
 ## Setup
 * setup environment
     * `$ python3 -m venv venv`
@@ -14,13 +16,19 @@
 
 * api key from [Alphavantage API](https://www.alphavantage.co/documentation/)
  
-### WIP
-- add trading data by symbol via CLI tool
+## Use 
+
+* add trading data by symbol via CLI tool
     - `$ python symbol.py GOOGL`
     - This gets data from alphavantage, parses the data and stores it in Influxdb.
     - Fetch data for all added stock `$ python symbol.py update_all=1`
     
-- add trading data by symbol via app
+* add trading data by symbol via app
     - (`$ python app.py`)
     - `http://localhost:5000/symbols`
- 
+
+* fetch data periodically
+    - schedule a periodic task to fetch daily data
+        - `$ celery -A tasks.app beat --loglevel=info`
+    - run the worker 
+        - `$ celery -A tasks.app worker --loglevel=info` 

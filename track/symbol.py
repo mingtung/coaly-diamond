@@ -215,6 +215,7 @@ if __name__ == "__main__":
                     print(f"got symbol {symbol}")
 
             if update_all:
+                # TODO use task
                 for symbol in get_all_symbols(debug=DEBUG):
                     print(f"writing trade data in db for {symbol}")
                     write_trade_data_in_db(symbol, full=full, debug=DEBUG)
