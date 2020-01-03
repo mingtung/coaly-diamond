@@ -18,10 +18,11 @@ class SymbolUtil:
     INFLUXDB_ADMIN_TOKEN = os.environ.get("INFLUXDB_ADMIN_TOKEN")
     INFLUXDB_ORG = os.environ.get("INFLUXDB_ORG")
     INFLUXDB_BUCKET = os.environ.get("INFLUXDB_BUCKET")
+    HOST = os.environ.get("WEB_HOST", "http://localhost")
 
     def __init__(
         self,
-        host="http://localhost",
+        host=HOST,
         port=9999,
         token=INFLUXDB_ADMIN_TOKEN,
         org=INFLUXDB_ORG,
@@ -177,11 +178,11 @@ def write_trade_data_in_db(symbol, full=False, debug=False):
 
 
 if __name__ == "__main__":
-    ALPHAVANTAGE_API_KEY = os.environ.get("ALPHAVANTAGE_API_KEY")
-    INFLUXDB_ADMIN_TOKEN = os.environ.get("INFLUXDB_ADMIN_TOKEN")
-    INFLUXDB_ORG = os.environ.get("INFLUXDB_ORG")
-    INFLUXDB_BUCKET = os.environ.get("INFLUXDB_BUCKET")
-    DEBUG = os.environ.get("DEBUG", False)
+    ALPHAVANTAGE_API_KEY = os.environ.get("ALPHAVANTAGE_API_KEY", "")
+    INFLUXDB_ADMIN_TOKEN = os.environ.get("INFLUXDB_ADMIN_TOKEN", "")
+    INFLUXDB_ORG = os.environ.get("INFLUXDB_ORG", "")
+    INFLUXDB_BUCKET = os.environ.get("INFLUXDB_BUCKET", "")
+    DEBUG = os.environ.get("DEBUG")
 
     if (
         ALPHAVANTAGE_API_KEY

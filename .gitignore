@@ -17,3 +17,6 @@ build/
 
 *.db
 *.sqlite3
+*.env
+celerybeat-schedule
+

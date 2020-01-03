@@ -1,0 +1,47 @@
+version: '3'
+
+services:
+    influxdb:
+        container_name: influxdb-stock
+        ports:
+            - "9999:9999"
+        image: "quay.io/influxdb/influxdb:2.0.0-alpha"
+        volumes:
+            - data:/var/lib/influxdb2
+        command: influxd run --bolt-path /var/lib/influxdb2/influxd.bolt --engine-path /var/lib/influxdb2/engine --store bolt
+
+    stock:
+        build: ./stock
+        volumes:
+            - ./stock:/code
+        ports:
+            - "5000:5000"
+        links:
+            - redis:redis
+        command: python app.py
+        env_file: .env
+
+    redis:
+        image: redis
+        ports:
+            - "6379:6379"
+
+    celery-worker:
+        build: ./stock
+        volumes:
+            - ./stock:/code
+        command: celery -A tasks.app worker --loglevel=info
+        user: nobody
+        env_file: .env
+
+    celery-scheduler:
+        build: ./stock
+        volumes:
+            - ./stock:/code
+        command: celery -A tasks.app beat --pidfile= --loglevel=info
+        user: nobody
+        env_file: .env
+
+
+volumes:
+    data:
