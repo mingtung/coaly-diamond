@@ -29,6 +29,10 @@
                 <li>{{ i }}</li>
             {% endfor %}
         </ol>
+        <form action="/symbols" method="POST">
+            <input type="hidden" id="update_all" name="update_all" value="true">
+            <button type="submit">Update all (fetch data for all symbols)</button>
+        </form>
     </body>
 </html>
 

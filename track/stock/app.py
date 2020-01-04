@@ -5,6 +5,7 @@ import os
 from flask import Flask, request, Response, render_template, jsonify
 
 from symbol import SymbolUtil, write_trade_data_in_db, get_all_symbols
+from tasks import fetch_daily_data
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -16,6 +17,7 @@ app = Flask(__name__)
 def list_symbols():
     search_symbol_name = request.form.get('search_symbol', '')
     confirmed_symbol_name = request.form.get('confirmed_symbol')
+    update_all = request.form.get('update_all', '')
 
     search_result = None
 
@@ -23,9 +25,12 @@ def list_symbols():
         if search_symbol_name:
             search_result = SymbolUtil.search_in_alphavantage(search_symbol_name)['bestMatches']
 
-        if confirmed_symbol_name:
+        elif confirmed_symbol_name:
             # add trade data for symbol in db
             write_trade_data_in_db(confirmed_symbol_name)
+
+        elif update_all:
+            fetch_daily_data.delay()
 
     symbols = get_all_symbols()
     return render_template("symbol.html", symbols=symbols,  search_symbol=search_symbol_name, search_result=search_result)
@@ -44,6 +49,7 @@ def get_trade_data(symbol):
 @app.route('/', methods=['GET'])
 def home():
     return Response('http://localhost:5000/symbols')
+
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000, debug=True)
